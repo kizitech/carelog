@@ -1,26 +1,24 @@
-# CareLog — Hospital Shift Reporting System
+# CareLog v2 — Patient-Centric Hospital Shift Reporting
 
-A modern, production-quality hospital shift reporting system built with Next.js 14, TypeScript, Tailwind CSS, and Framer Motion.
-
----
-
-## ✨ Features
-
-- **Authentication** — Mock login with form validation (Zod + React Hook Form)
-- **Dashboard** — Live stats, Recharts analytics (bar + pie), filtered reports table
-- **Report Submission** — Grouped form with patient info, treatment details, and handover sections
-- **Report Details** — Full modal view with all shift data
-- **Trash System** — Soft-delete with restore / permanent delete
-- **Search & Filters** — Real-time search by patient/staff + filter by condition, department, date
-- **Profile Modal** — Editable staff profile with "notify admin" action
-- **Dark Mode** — Light / Dark / System via `next-themes`
-- **Animations** — Framer Motion page transitions, table row staggering, modal entrances
-- **Persistence** — All data saved to `localStorage`
-- **Responsive** — Mobile-first, works on all screen sizes
+A modern, production-quality hospital shift management system built with Next.js 14, TypeScript, Tailwind CSS, Framer Motion, and Recharts.
 
 ---
 
-## 🛠 Tech Stack
+## What's New in v2
+
+- **Patient Assignment System** — Staff sees their assigned patients on login
+- **Persistent Patient Records** — Every patient has a profile with full cross-shift history
+- **Patient Timeline** — Vertical chronological log of all shift entries per patient
+- **Multi-Patient Shift Reports** — One report covers all patients seen in a shift
+- **Patient List Page** — Browse, search and filter all hospital patients
+- **Shift Filter** — Filter reports by Morning / Afternoon / Night
+- **Reset System** — Restore all demo data from the user menu
+- **Blue Healthcare Theme** — Deep blue dark mode, soft blue light mode
+- **Confirm Dialogs** — Destructive actions require confirmation
+
+---
+
+## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -37,119 +35,91 @@ A modern, production-quality hospital shift reporting system built with Next.js 
 
 ---
 
-## 🚀 Getting Started
-
-### 1. Install dependencies
+## Getting Started
 
 ```bash
 npm install
-# or
-yarn install
-# or
-pnpm install
-```
-
-### 2. Run the development server
-
-```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### 3. Login
-
-Use **any email address** and **any password** to log in (mock auth — no backend required).
+Open http://localhost:3000 — log in with any email + any password.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 carelog/
 ├── app/
-│   ├── globals.css          # Global styles, CSS variables, fonts
-│   ├── layout.tsx           # Root layout with providers
-│   ├── page.tsx             # Redirect root → /dashboard or /login
-│   ├── login/
-│   │   └── page.tsx         # Login page
-│   ├── dashboard/
-│   │   └── page.tsx         # Main dashboard
-│   └── trash/
-│       └── page.tsx         # Trash / soft-delete management
+│   ├── globals.css              # CSS variables (blue theme), fonts
+│   ├── layout.tsx
+│   ├── page.tsx                 # Auth-aware redirect
+│   ├── login/page.tsx
+│   ├── dashboard/page.tsx       # Main dashboard
+│   ├── patients/
+│   │   ├── page.tsx             # Patient list
+│   │   └── [id]/page.tsx        # Patient profile + timeline
+│   └── trash/page.tsx
 │
 ├── components/
-│   ├── layout/
-│   │   ├── AppShell.tsx     # Auth guard + layout wrapper
-│   │   ├── Navbar.tsx       # Sticky top navbar with user menu + theme
-│   │   └── ThemeProvider.tsx
-│   ├── shared/
-│   │   ├── index.tsx        # Badge, Button, StatCard, Toggle, Avatar, Input…
-│   │   └── Modal.tsx        # Animated modal with backdrop
-│   ├── reports/
-│   │   ├── ReportForm.tsx   # Multi-section new report form
-│   │   ├── ReportDetail.tsx # Full report detail view
-│   │   ├── ReportsTable.tsx # Data table with row actions
-│   │   ├── FilterBar.tsx    # Search + filter controls
-│   │   └── ProfileModal.tsx # Staff profile editor
-│   └── charts/
-│       └── AnalyticsCharts.tsx  # Bar + Pie charts
+│   ├── layout/                  # Navbar, AppShell, ThemeProvider
+│   ├── shared/                  # Button, Modal, ConfirmDialog, inputs…
+│   ├── reports/                 # ReportForm, ReportsTable, FilterBar…
+│   ├── patients/                # AssignedPatientsPanel, PatientTimeline
+│   └── charts/                  # AnalyticsCharts
 │
-├── context/
-│   └── AppContext.tsx       # Global state (auth + reports + filters)
-│
-├── lib/
-│   ├── utils.ts             # Helpers, constants, date formatters
-│   ├── schemas.ts           # Zod validation schemas
-│   └── seed.ts              # Sample reports data
-│
-└── types/
-    └── index.ts             # TypeScript interfaces
+├── context/AppContext.tsx        # Global state (auth, patients, reports)
+├── lib/                          # utils, schemas, seed data
+└── types/index.ts               # Patient, Report, PatientLog, User
 ```
 
 ---
 
-## 🎨 Design System
+## Data Model
 
-| Token | Value |
-|-------|-------|
-| Primary | Teal (`#0d9488`) |
-| Font | DM Sans (body) + DM Mono |
-| Border radius | 12px (md) / 16px (lg) / 24px (xl) |
-| Shadow | Soft, multi-layer |
-| Dark mode | Full CSS variable system |
+```
+Patient        id, name, dob, department, ward, currentCondition, assignedTo[]
+Report         id, staffId, staffName, department, shift, date, patients[]
+PatientLog     patientId, conditionBefore, conditionAfter, observations,
+               treatment, medication, medNotes, injuries, educationGiven, notes
+```
 
 ---
 
-## 📸 Pages
+## Pages
 
 | Route | Description |
 |-------|-------------|
-| `/` | Auto-redirects based on auth state |
-| `/login` | Centered login card with gradient background |
-| `/dashboard` | Stats → Charts → Filters → Reports table |
-| `/trash` | Soft-deleted reports with restore/delete actions |
+| /login | Auth page |
+| /dashboard | Stats, assigned patients, charts, reports table |
+| /patients | All patients with filters |
+| /patients/[id] | Patient profile + vertical history timeline |
+| /trash | Soft-deleted reports |
 
 ---
 
-## 📝 Notes for Academic Presentation
+## Key Workflows
 
-- All data is stored in `localStorage` — no backend needed
-- The login accepts any valid email + password combination
-- Reports are pre-seeded with realistic sample data
-- The app is fully functional offline
-- Clean component separation makes it easy to explain architecture
-- TypeScript types are defined for all data structures
+**Submit a Shift Report**
+1. Click New Shift Report
+2. Set department, shift, date
+3. Select patients from dropdown
+4. Fill per-patient observations, treatment, conditions
+5. Submit — patient currentCondition updates automatically
+
+**View Patient History**
+1. Go to Patients page
+2. Click any patient card
+3. See profile + chronological timeline of all entries
+
+**Reset Demo Data**
+Avatar menu → Reset Demo Data → Confirm
 
 ---
 
-## 📦 Build for Production
+## Build for Production
 
 ```bash
 npm run build
 npm start
 ```
-
----
-
-*Built with ❤️ for clinical excellence.*
