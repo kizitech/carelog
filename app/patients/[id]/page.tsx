@@ -1,7 +1,6 @@
 "use client";
 // app/patients/[id]/page.tsx
 import { useRouter } from "next/navigation";
-import { use } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, User, Building2, Calendar, Clock, FileText, AlertTriangle, Activity } from "lucide-react";
 import { useApp } from "@/context/AppContext";
@@ -10,8 +9,8 @@ import { ConditionBadge, Button } from "@/components/shared";
 import { PatientTimeline } from "@/components/patients/PatientTimeline";
 import { formatTimestamp, getInitials } from "@/lib/utils";
 
-export default function PatientDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function PatientDetailPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const { getPatient, getPatientReports } = useApp();
   const router = useRouter();
 

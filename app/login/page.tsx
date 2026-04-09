@@ -29,15 +29,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
-      style={{ background: "linear-gradient(135deg, #eff6ff 0%, #f8fafc 50%, #eef2ff 100%)" }}>
-      {/* dark mode bg */}
-      <style>{`@media(prefers-color-scheme:dark){.login-bg{background:linear-gradient(135deg,#0f172a 0%,#111827 50%,#0f1b2d 100%)!important}}`}</style>
-
-      {/* Background grid */}
-      <div className="absolute inset-0 opacity-30 dark:opacity-10 pointer-events-none"
-        style={{ backgroundImage: "linear-gradient(rgba(59,130,246,0.07) 1px,transparent 1px),linear-gradient(to right,rgba(59,130,246,0.07) 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
-
+    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-card">
       {/* Blobs */}
       <div className="absolute top-0 left-0 w-80 h-80 bg-blue-400/15 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-400/15 rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none" />
