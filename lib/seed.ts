@@ -1,155 +1,28 @@
 // lib/seed.ts
-import type { Patient, Report } from "@/types";
+import type { Resident, ShiftLog } from "@/types";
 
 const now = Date.now();
 const day = 86_400_000;
 const hour = 3_600_000;
 
-export const SEED_PATIENTS: Patient[] = [
-  {
-    id: "p1", name: "Margaret Owusu", dob: "1968-03-14",
-    department: "General Ward", admittedDate: "2025-04-01",
-    currentCondition: "Stable", assignedTo: ["u1", "u2"],
-    ward: "Ward 4B", notes: "Type 2 diabetic. Mild hypertension. Responsive to standard care.",
-  },
-  {
-    id: "p2", name: "James Adekunle", dob: "1975-11-02",
-    department: "ICU", admittedDate: "2025-04-02",
-    currentCondition: "Critical", assignedTo: ["u2"],
-    ward: "ICU Bay 2", notes: "Septic shock secondary to urosepsis. On vasopressors.",
-  },
-  {
-    id: "p3", name: "Blessing Nwachukwu", dob: "2012-07-19",
-    department: "Pediatrics", admittedDate: "2025-04-03",
-    currentCondition: "Improving", assignedTo: ["u3"],
-    ward: "Peds Ward A", notes: "Viral fever, resolving. Appetite improving.",
-  },
-  {
-    id: "p4", name: "Emmanuel Eze", dob: "1990-05-28",
-    department: "Surgery", admittedDate: "2025-04-03",
-    currentCondition: "Stable", assignedTo: ["u1"],
-    ward: "Surgical Ward 2", notes: "Post-op appendicectomy Day 2. Wound clean.",
-  },
-  {
-    id: "p5", name: "Grace Akpan", dob: "1993-09-10",
-    department: "Emergency", admittedDate: "2025-04-01",
-    currentCondition: "Serious", assignedTo: ["u2"],
-    ward: "Emergency Bay 1", notes: "Severe pre-eclampsia 36 weeks. Seizure history.",
-  },
-  {
-    id: "p6", name: "Samuel Okonkwo", dob: "1985-01-22",
-    department: "General Ward", admittedDate: "2025-04-03",
-    currentCondition: "Stable", assignedTo: ["u1", "u3"],
-    ward: "Ward 3A", notes: "Asthma exacerbation, significantly improved.",
-  },
-  {
-    id: "p7", name: "Aisha Bello", dob: "1955-06-30",
-    department: "ICU", admittedDate: "2025-04-04",
-    currentCondition: "Serious", assignedTo: ["u2"],
-    ward: "ICU Bay 5", notes: "COPD exacerbation, BiPAP support.",
-  },
-  {
-    id: "p8", name: "Chidi Obi", dob: "2001-12-05",
-    department: "Surgery", admittedDate: "2025-04-05",
-    currentCondition: "Improving", assignedTo: ["u1"],
-    ward: "Surgical Ward 1", notes: "Laparoscopic cholecystectomy. Day 1 post-op.",
-  },
+export const SEED_RESIDENTS: Resident[] = [
+  { id: "r1", name: "Dorothy Hastings", dob: "1938-06-12", room: "Room 4", wing: "Sunrise Wing", admittedDate: "2024-01-15", currentCondition: "Well", keyWorker: "Sarah Mensah", notes: "Enjoys reading and afternoon tea. Hard of hearing in left ear. Prefers to be called Dot." },
+  { id: "r2", name: "Albert Thompson", dob: "1935-03-28", room: "Room 7", wing: "Sunrise Wing", admittedDate: "2024-03-02", currentCondition: "Needs Monitoring", keyWorker: "Ada Obi", notes: "Mild dementia. Can become confused in the evenings (sundowning). Enjoys music from the 1950s." },
+  { id: "r3", name: "Ethel Morrison", dob: "1942-11-05", room: "Room 12", wing: "Garden Wing", admittedDate: "2023-08-20", currentCondition: "Well", keyWorker: "Ada Obi", notes: "Very independent. Likes to help set tables. Daughter visits every Thursday." },
+  { id: "r4", name: "George Whitfield", dob: "1933-09-17", room: "Room 3", wing: "Garden Wing", admittedDate: "2024-06-10", currentCondition: "Unwell", keyWorker: "Sarah Mensah", notes: "Recent chest infection. On antibiotics. Reduced appetite this week. Needs encouragement to eat." },
+  { id: "r5", name: "Mabel Okafor", dob: "1940-02-14", room: "Room 8", wing: "Oak Wing", admittedDate: "2023-12-01", currentCondition: "Improved", keyWorker: "Fatima Hassan", notes: "Recovering from a fall 3 weeks ago. Mobility improving. Physio twice weekly." },
+  { id: "r6", name: "Harold Davies", dob: "1936-07-30", room: "Room 15", wing: "Oak Wing", admittedDate: "2024-02-18", currentCondition: "Well", keyWorker: "Fatima Hassan", notes: "Former school teacher. Very chatty. Enjoys puzzles and the daily newspaper." },
+  { id: "r7", name: "Rose Adeyemi", dob: "1944-04-22", room: "Room 2", wing: "Maple Wing", admittedDate: "2024-07-05", currentCondition: "Needs Monitoring", keyWorker: "Ada Obi", notes: "Type 2 diabetes. Blood sugar monitoring twice daily. Dietary restrictions — no sugary snacks." },
+  { id: "r8", name: "Frederick Barnes", dob: "1931-12-08", room: "Room 18", wing: "Maple Wing", admittedDate: "2023-05-14", currentCondition: "Well", keyWorker: "Sarah Mensah", notes: "Oldest resident. Sharp mind. Needs walking frame for mobility. Enjoys card games in the lounge." },
 ];
 
-export const SEED_REPORTS: Report[] = [
-  {
-    id: "r1", staffId: "u1", staffName: "Nurse Ada Obi",
-    department: "General Ward", shift: "Morning", date: "2025-04-04",
-    timestamp: now - day * 2 + hour * 9, trashed: false,
-    notes: "Quiet morning shift. All patients stable.",
-    patients: [
-      {
-        patientId: "p1", patientName: "Margaret Owusu",
-        conditionBefore: "Improving", conditionAfter: "Stable",
-        observations: "Patient alert and oriented. Vitals stable. BP 128/82.",
-        treatment: "Continued Metformin and Amlodipine. IV line removed.",
-        medication: true, medNotes: "Metformin 500mg BD, Amlodipine 5mg OD",
-        injuries: "", educationGiven: "Dietary advice for diabetes management.",
-        notes: "Patient requests discharge tomorrow.", timestamp: now - day * 2 + hour * 9,
-      },
-      {
-        patientId: "p6", patientName: "Samuel Okonkwo",
-        conditionBefore: "Serious", conditionAfter: "Improving",
-        observations: "Wheeze significantly reduced. SpO2 98% on room air.",
-        treatment: "Salbutamol nebuliser Q4H, Prednisolone continued.",
-        medication: true, medNotes: "Salbutamol 2.5mg Q4H, Prednisolone 40mg OD",
-        injuries: "", educationGiven: "Inhaler technique demonstrated.",
-        notes: "Considering step-down to Q6H.", timestamp: now - day * 2 + hour * 9 + 30 * 60000,
-      },
-    ],
-  },
-  {
-    id: "r2", staffId: "u2", staffName: "Dr. Kwame Asante",
-    department: "ICU", shift: "Night", date: "2025-04-04",
-    timestamp: now - day * 2 + hour * 2, trashed: false,
-    notes: "Challenging night. Two patients requiring close monitoring.",
-    patients: [
-      {
-        patientId: "p2", patientName: "James Adekunle",
-        conditionBefore: "Critical", conditionAfter: "Critical",
-        observations: "MAP fluctuating 58-72. UO 0.4ml/kg/h. SOFA score 12.",
-        treatment: "Norepinephrine uptitrated to 0.3mcg/kg/min. Fluid challenge given.",
-        medication: true, medNotes: "Norepinephrine 0.3mcg/kg/min, Pip-Taz 4.5g Q8H, Insulin sliding scale",
-        injuries: "", educationGiven: "",
-        notes: "BP dropped to 80/50 at 02:30 - responded to 500ml NS bolus.", timestamp: now - day * 2 + hour * 2,
-      },
-      {
-        patientId: "p5", patientName: "Grace Akpan",
-        conditionBefore: "Critical", conditionAfter: "Serious",
-        observations: "BP 170/105. Proteinuria 3+. CTG reactive at 03:00.",
-        treatment: "MgSO4 infusion continued. Labetalol IV for BP.",
-        medication: true, medNotes: "MgSO4 1g/h, Labetalol 20mg IV PRN",
-        injuries: "", educationGiven: "Management plan explained to patient and spouse.",
-        notes: "Seizure at 01:15 managed with Diazepam. Neuro consult requested.", timestamp: now - day * 2 + hour * 2 + 45 * 60000,
-      },
-    ],
-  },
-  {
-    id: "r3", staffId: "u3", staffName: "Nurse Fatima Hassan",
-    department: "Pediatrics", shift: "Afternoon", date: "2025-04-05",
-    timestamp: now - day + hour * 14, trashed: false,
-    notes: "Good shift. Paeds ward settled well.",
-    patients: [
-      {
-        patientId: "p3", patientName: "Blessing Nwachukwu",
-        conditionBefore: "Serious", conditionAfter: "Improving",
-        observations: "Temperature 37.2C. Eating small amounts. Playing with toys.",
-        treatment: "Oral rehydration encouraged. Paracetamol PRN only.",
-        medication: false, medNotes: "", injuries: "",
-        educationGiven: "Hygiene education given to mother. Fever management at home.",
-        notes: "Likely ready for discharge tomorrow if apyrexial.", timestamp: now - day + hour * 14,
-      },
-    ],
-  },
-  {
-    id: "r4", staffId: "u1", staffName: "Nurse Ada Obi",
-    department: "Surgery", shift: "Morning", date: "2025-04-05",
-    timestamp: now - hour * 6, trashed: false,
-    notes: "Routine post-op monitoring. All wounds clean.",
-    patients: [
-      {
-        patientId: "p4", patientName: "Emmanuel Eze",
-        conditionBefore: "Stable", conditionAfter: "Stable",
-        observations: "Wound clean and dry. Tolerating oral diet. Pain 2/10.",
-        treatment: "Wound dressing changed. Mobilised with physio.",
-        medication: true, medNotes: "Paracetamol 1g TID, Tramadol 50mg PRN, Enoxaparin 40mg SC OD",
-        injuries: "", educationGiven: "Wound care and signs of infection explained.",
-        notes: "Discharge planned tomorrow. Transport confirmed.", timestamp: now - hour * 6,
-      },
-      {
-        patientId: "p8", patientName: "Chidi Obi",
-        conditionBefore: "Stable", conditionAfter: "Improving",
-        observations: "Tolerating sips. Wound sites clean. Minimal pain.",
-        treatment: "Early mobilisation encouraged. Analgesia adjusted.",
-        medication: true, medNotes: "Paracetamol 1g QID, Ibuprofen 400mg TID",
-        injuries: "", educationGiven: "Post-laparoscopic care and lifting restrictions.",
-        notes: "Patient anxious about discharge. Social worker referral made.", timestamp: now - hour * 6 + 25 * 60000,
-      },
-    ],
-  },
+export const SEED_LOGS: ShiftLog[] = [
+  { id: "sl1", residentId: "r1", residentName: "Dorothy Hastings", staffId: "u1", staffName: "Ada Obi", shift: "Morning", date: "2025-04-08", timestamp: now - day * 2 + hour * 9, conditionUpdate: "Dot had a good morning. Alert and in good spirits. Enjoyed her breakfast and had a full cup of tea.", medicationTaken: true, incidents: "", tasksForNextShift: "Daughter rang — will visit Saturday. Please let Dot know. Check if her library book has arrived.", careProvided: "Assisted with morning wash and dressing. Reminded her about her hearing aid.", trashed: false },
+  { id: "sl2", residentId: "r2", residentName: "Albert Thompson", staffId: "u1", staffName: "Ada Obi", shift: "Morning", date: "2025-04-08", timestamp: now - day * 2 + hour * 9 + 40 * 60000, conditionUpdate: "Albert was confused this morning — thought he was at home. Settled after reassurance and familiar music.", medicationTaken: true, incidents: "Attempted to leave via the front door at 08:15. Calmly redirected. No distress.", tasksForNextShift: "Monitor closely this afternoon as confusion may persist. Ensure music is on during tea time. Family are aware.", careProvided: "Morning care completed. Encouraged to eat — ate about half. Played his favourite Glenn Miller record.", trashed: false },
+  { id: "sl3", residentId: "r4", residentName: "George Whitfield", staffId: "u2", staffName: "Sarah Mensah", shift: "Afternoon", date: "2025-04-08", timestamp: now - day * 2 + hour * 15, conditionUpdate: "George still quite unwell. Cough persisting. Low energy but communicating well. Temp 37.8°C.", medicationTaken: true, incidents: "", tasksForNextShift: "Night staff — please check on George at 22:00. Ensure water by his bed. GP visit booked tomorrow 10am.", careProvided: "Encouraged fluids and light snack. Repositioned regularly. Kept comfortable with extra blanket.", trashed: false },
+  { id: "sl4", residentId: "r5", residentName: "Mabel Okafor", staffId: "u3", staffName: "Fatima Hassan", shift: "Afternoon", date: "2025-04-08", timestamp: now - day * 2 + hour * 16, conditionUpdate: "Mabel walked to the lounge independently today for the first time since her fall. Huge progress. Mood excellent.", medicationTaken: true, incidents: "", tasksForNextShift: "Let morning staff know about her milestone! Continue encouraging gentle walks each day.", careProvided: "Supervised walk to lounge and back. Physio exercises completed. Seated in garden for 20 minutes.", trashed: false },
+  { id: "sl5", residentId: "r7", residentName: "Rose Adeyemi", staffId: "u1", staffName: "Ada Obi", shift: "Morning", date: "2025-04-09", timestamp: now - day + hour * 8, conditionUpdate: "Blood sugar 8.2 this morning — within acceptable range. Rose feeling well. Good appetite.", medicationTaken: true, incidents: "", tasksForNextShift: "Blood sugar check again at 17:00. Rose has asked for her niece's phone number — check personal file.", careProvided: "Morning care. Blood sugar check done. Appropriate breakfast provided per dietary plan.", trashed: false },
+  { id: "sl6", residentId: "r2", residentName: "Albert Thompson", staffId: "u3", staffName: "Fatima Hassan", shift: "Afternoon", date: "2025-04-09", timestamp: now - day + hour * 14, conditionUpdate: "Calmer afternoon than yesterday. Albert recognised staff today and was more settled. Had a good lunch.", medicationTaken: true, incidents: "", tasksForNextShift: "Albert responded well to 1950s music playlist — keep this going. Night staff check he is settled before 21:00.", careProvided: "Afternoon care, assisted with lunch. Music therapy session. Walk in the garden with support.", trashed: false },
+  { id: "sl7", residentId: "r4", residentName: "George Whitfield", staffId: "u2", staffName: "Sarah Mensah", shift: "Morning", date: "2025-04-09", timestamp: now - day + hour * 9, conditionUpdate: "George slightly better today. Temp 37.2°C. Cough less frequent. Managed a full breakfast.", medicationTaken: true, incidents: "", tasksForNextShift: "GP visited — antibiotics continue 5 more days. Give with food. Please update family this afternoon.", careProvided: "Morning care. Supported with breakfast. Encouraged to sit up in chair for an hour.", trashed: false },
+  { id: "sl8", residentId: "r1", residentName: "Dorothy Hastings", staffId: "u2", staffName: "Sarah Mensah", shift: "Afternoon", date: "2025-04-09", timestamp: now - hour * 4, conditionUpdate: "Dot in very good form. Daughter visited — lovely visit. Dot was happy and chatty all afternoon.", medicationTaken: true, incidents: "", tasksForNextShift: "Dot would like a bath tomorrow morning rather than a shower. Please note for morning team.", careProvided: "Afternoon care. Accompanied Dot and her daughter for a walk in the garden. Served afternoon tea.", trashed: false },
 ];

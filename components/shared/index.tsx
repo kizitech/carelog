@@ -1,12 +1,12 @@
 "use client";
 // components/shared/index.tsx
 import { cn, CONDITION_COLORS } from "@/lib/utils";
-import type { Condition } from "@/types";
+import type { ConditionStatus } from "@/types";
 import type { ReactNode, ButtonHTMLAttributes } from "react";
 import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
-export function ConditionBadge({ condition }: { condition: Condition }) {
+export function ConditionBadge({ condition }: { condition: ConditionStatus }) {
   const c = CONDITION_COLORS[condition];
   return (
     <span className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border", c.bg, c.text, c.border)}>
@@ -21,24 +21,22 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: "sm" | "md" | "lg";
   loading?: boolean;
   icon?: ReactNode;
-  iconRight?: ReactNode;
 }
 
-export function Button({ variant = "primary", size = "md", loading = false, icon, iconRight, children, className, disabled, ...props }: ButtonProps) {
-  const base = "inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all active:scale-[.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100 whitespace-nowrap";
+export function Button({ variant = "primary", size = "md", loading = false, icon, children, className, disabled, ...props }: ButtonProps) {
+  const base = "inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all active:scale-[.98] disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap";
   const variants = {
-    primary: "bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30",
-    secondary: "bg-secondary hover:bg-accent text-secondary-foreground",
-    ghost: "bg-transparent hover:bg-accent text-foreground",
-    danger: "bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-500/20",
-    outline: "bg-transparent border border-border hover:bg-accent text-foreground",
+    primary:  "bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20",
+    secondary:"bg-secondary hover:bg-accent text-secondary-foreground",
+    ghost:    "bg-transparent hover:bg-accent text-foreground",
+    danger:   "bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-500/20",
+    outline:  "bg-transparent border border-border hover:bg-accent text-foreground",
   };
   const sizes = { sm: "px-3 py-1.5 text-[13px]", md: "px-4 py-2.5 text-sm", lg: "px-5 py-3 text-[15px]" };
   return (
     <button disabled={disabled || loading} className={cn(base, variants[variant], sizes[size], className)} {...props}>
       {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : icon || null}
       {children}
-      {!loading && iconRight}
     </button>
   );
 }
@@ -87,15 +85,17 @@ export function Toggle({ checked, onChange, label }: { checked: boolean; onChang
   return (
     <div className="flex items-center gap-3">
       <button type="button" role="switch" aria-checked={checked} onClick={() => onChange(!checked)}
-        className={cn("relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200", checked ? "bg-blue-500" : "bg-gray-200 dark:bg-gray-700")}>
-        <span className={cn("pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-200", checked ? "translate-x-5" : "translate-x-0")} />
+        className={cn("relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200",
+          checked ? "bg-blue-500" : "bg-gray-200 dark:bg-gray-700")}>
+        <span className={cn("pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-200",
+          checked ? "translate-x-5" : "translate-x-0")} />
       </button>
       {label && <span className="text-sm font-medium text-foreground">{label}</span>}
     </div>
   );
 }
 
-export function Avatar({ initials, size = "md", className }: { initials: string; size?: "sm" | "md" | "lg" | "xl"; className?: string }) {
+export function Avatar({ initials, size = "md", className }: { initials: string; size?: "sm"|"md"|"lg"|"xl"; className?: string }) {
   const sizes = { sm: "w-7 h-7 text-[11px]", md: "w-9 h-9 text-sm", lg: "w-12 h-12 text-base", xl: "w-16 h-16 text-xl" };
   return (
     <div className={cn("rounded-full bg-gradient-to-br from-blue-400 to-blue-700 flex items-center justify-center font-bold text-white flex-shrink-0", sizes[size], className)}>
@@ -104,14 +104,8 @@ export function Avatar({ initials, size = "md", className }: { initials: string;
   );
 }
 
-export function Card({ children, className, padding = true }: { children: ReactNode; className?: string; padding?: boolean }) {
-  return (
-    <div className={cn("bg-card border border-border rounded-2xl shadow-sm", padding && "p-5", className)}>{children}</div>
-  );
-}
-
-export function FormField({ label, icon, required, error, children }: {
-  label: string; icon?: ReactNode; required?: boolean; error?: string; children: ReactNode;
+export function FormField({ label, icon, required, error, children, hint }: {
+  label: string; icon?: ReactNode; required?: boolean; error?: string; children: ReactNode; hint?: string;
 }) {
   return (
     <div className="space-y-1.5">
@@ -121,21 +115,20 @@ export function FormField({ label, icon, required, error, children }: {
         {required && <span className="text-red-500 ml-0.5">*</span>}
       </label>
       {children}
+      {hint && <p className="text-xs text-muted-foreground/70">{hint}</p>}
       {error && <p className="text-red-500 text-xs">{error}</p>}
     </div>
   );
 }
 
-const inputBase = "w-full px-3 py-2.5 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all disabled:opacity-60 disabled:cursor-not-allowed";
+const inputBase = "w-full px-3 py-2.5 text-sm rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all disabled:opacity-60";
 
 export function Input({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   return <input className={cn(inputBase, className)} {...props} />;
 }
-
 export function Textarea({ className, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return <textarea className={cn(inputBase, "min-h-[80px] resize-y", className)} {...props} />;
 }
-
 export function Select({ className, children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return <select className={cn(inputBase, "cursor-pointer", className)} {...props}>{children}</select>;
 }

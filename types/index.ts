@@ -1,14 +1,15 @@
 // types/index.ts
 
-export type Condition = "Stable" | "Critical" | "Improving" | "Serious";
-export type Department =
-  | "Emergency"
-  | "ICU"
-  | "Pediatrics"
-  | "Surgery"
-  | "General Ward";
+export type ConditionStatus =
+  | "Well"
+  | "Unwell"
+  | "Needs Monitoring"
+  | "Improved"
+  | "Declined";
+
 export type Shift = "Morning" | "Afternoon" | "Night";
-export type Role = "Nurse" | "Doctor" | "Senior Nurse" | "Resident" | "Intern";
+export type Role = "Care Worker" | "Senior Carer" | "Team Leader" | "Manager" | "Night Staff";
+export type Wing = "Sunrise Wing" | "Garden Wing" | "Oak Wing" | "Maple Wing";
 
 export interface User {
   id: string;
@@ -17,66 +18,49 @@ export interface User {
   role: Role;
   shift: Shift;
   avatar: string;
-  department: Department;
+  wing: Wing;
 }
 
-export interface Patient {
+// A resident in the care home (replaces Patient)
+export interface Resident {
   id: string;
   name: string;
-  dob: string;
-  department: Department;
-  admittedDate: string;
-  currentCondition: Condition;
-  assignedTo: string[];
-  ward: string;
-  notes: string;
+  dob: string;          // YYYY-MM-DD
+  room: string;
+  wing: Wing;
+  admittedDate: string; // YYYY-MM-DD
+  currentCondition: ConditionStatus;
+  keyWorker: string;    // staff name
+  notes: string;        // general care notes
 }
 
-export interface PatientLog {
-  patientId: string;
-  patientName: string;
-  conditionBefore: Condition;
-  conditionAfter: Condition;
-  observations: string;
-  treatment: string;
-  medication: boolean;
-  medNotes: string;
-  injuries: string;
-  educationGiven: string;
-  notes: string;
-  timestamp: number;
-}
-
-export interface Report {
+// One shift log entry for one resident (replaces Report)
+export interface ShiftLog {
   id: string;
+  residentId: string;
+  residentName: string;
   staffId: string;
   staffName: string;
-  department: Department;
   shift: Shift;
-  date: string;
+  date: string;         // YYYY-MM-DD
   timestamp: number;
-  patients: PatientLog[];
+  conditionUpdate: string;       // free-text condition narrative
+  medicationTaken: boolean;
+  incidents: string;             // optional
+  tasksForNextShift: string;     // MOST IMPORTANT field
+  careProvided: string;          // what was done this shift
   trashed: boolean;
-  notes: string;
 }
 
-export interface PatientLogFormValues {
-  patientId: string;
-  conditionBefore: Condition;
-  conditionAfter: Condition;
-  observations: string;
-  treatment: string;
-  medication: boolean;
-  medNotes: string;
-  injuries: string;
-  educationGiven: string;
-  notes: string;
-}
-
-export interface ReportFormValues {
-  department: Department;
+// Form shape
+export interface ShiftLogFormValues {
+  residentId: string;
+  conditionUpdate: string;
+  medicationTaken: boolean;
+  incidents: string;
+  tasksForNextShift: string;
+  careProvided: string;
+  staffName: string;
   shift: Shift;
   date: string;
-  notes: string;
-  patients: PatientLogFormValues[];
 }
