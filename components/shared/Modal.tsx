@@ -9,22 +9,21 @@ interface ModalProps {
   open: boolean;
   onClose: () => void;
   title: string;
+  description?: string;
   children: React.ReactNode;
   wide?: boolean;
-  extraWide?: boolean;
-  description?: string;
 }
 
-export function Modal({ open, onClose, title, children, wide = false, extraWide = false, description }: ModalProps) {
+export function Modal({ open, onClose, title, description, children, wide = false }: ModalProps) {
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    if (open) window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
+    const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    if (open) window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
   }, [open, onClose]);
 
   return (
@@ -33,10 +32,9 @@ export function Modal({ open, onClose, title, children, wide = false, extraWide 
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
             className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-          <motion.div initial={{ opacity: 0, scale: 0.95, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.97, y: 8 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className={cn("relative bg-card border border-border rounded-2xl shadow-2xl w-full overflow-hidden",
-              extraWide ? "max-w-[900px]" : wide ? "max-w-[720px]" : "max-w-[540px]")}
+          <motion.div initial={{ opacity: 0, scale: 0.95, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.97, y: 8 }} transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className={cn("relative bg-card border border-border rounded-2xl shadow-2xl w-full overflow-hidden", wide ? "max-w-[640px]" : "max-w-[520px]")}
             style={{ maxHeight: "92vh" }}>
             <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-border bg-card/95 backdrop-blur-sm">
               <div>

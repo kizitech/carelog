@@ -2,12 +2,12 @@
 // components/staff/ProfileModal.tsx
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User, Mail, Shield, MapPin, Check, Send } from "lucide-react";
+import { User, Mail, Shield, Check, Send } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { profileSchema, type ProfileFormValues } from "@/lib/schemas";
 import { FormField, Input, Select, Button, Avatar } from "@/components/shared";
 import { Modal } from "@/components/shared/Modal";
-import { ROLES, WINGS } from "@/lib/utils";
+import { ROLES } from "@/lib/utils";
 import { toast } from "sonner";
 
 export function ProfileModal({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -15,7 +15,11 @@ export function ProfileModal({ open, onClose }: { open: boolean; onClose: () => 
 
   const { register, handleSubmit, formState: { errors, isSubmitting, isDirty } } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
-    values: { name: user?.name || "", email: user?.email || "", role: user?.role || "Care Worker", wing: user?.wing || "Sunrise Wing" },
+    values: {
+      name:  user?.name  || "",
+      email: user?.email || "",
+      role:  user?.role  || "Care Worker",
+    },
   });
 
   const onSubmit = async (data: ProfileFormValues) => {
@@ -28,7 +32,7 @@ export function ProfileModal({ open, onClose }: { open: boolean; onClose: () => 
   if (!user) return null;
 
   return (
-    <Modal open={open} onClose={onClose} title="My Profile" description="Update your staff details">
+    <Modal open={open} onClose={onClose} title="My Profile" description="Update your details">
       <div className="space-y-5">
         {/* Header */}
         <div className="flex items-center gap-4 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-100 dark:border-blue-900/40">
@@ -36,10 +40,9 @@ export function ProfileModal({ open, onClose }: { open: boolean; onClose: () => 
           <div>
             <h3 className="text-lg font-extrabold text-foreground">{user.name}</h3>
             <p className="text-sm text-blue-600 dark:text-blue-400 font-semibold">{user.role}</p>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs bg-secondary text-muted-foreground px-2 py-0.5 rounded-full font-medium">{user.shift} Shift</span>
-              <span className="text-xs bg-secondary text-muted-foreground px-2 py-0.5 rounded-full font-medium">{user.wing}</span>
-            </div>
+            <span className="inline-block mt-1 text-xs bg-secondary text-muted-foreground px-2 py-0.5 rounded-full font-medium">
+              {user.shift} Shift
+            </span>
           </div>
         </div>
 
@@ -50,14 +53,12 @@ export function ProfileModal({ open, onClose }: { open: boolean; onClose: () => 
           <FormField label="Email" icon={<Mail className="w-3.5 h-3.5" />} required error={errors.email?.message}>
             <Input {...register("email")} type="email" />
           </FormField>
-          <div className="grid grid-cols-2 gap-3">
-            <FormField label="Role" icon={<Shield className="w-3.5 h-3.5" />} required error={errors.role?.message}>
-              <Select {...register("role")}>{ROLES.map(r => <option key={r}>{r}</option>)}</Select>
-            </FormField>
-            <FormField label="Wing" icon={<MapPin className="w-3.5 h-3.5" />} required error={errors.wing?.message}>
-              <Select {...register("wing")}>{WINGS.map(w => <option key={w}>{w}</option>)}</Select>
-            </FormField>
-          </div>
+          <FormField label="Role" icon={<Shield className="w-3.5 h-3.5" />} required error={errors.role?.message}>
+            <Select {...register("role")}>
+              {ROLES.map(r => <option key={r}>{r}</option>)}
+            </Select>
+          </FormField>
+
           <div className="flex gap-3 pt-1">
             <Button type="button" variant="outline" icon={<Send className="w-3.5 h-3.5" />}
               onClick={() => toast.info("Update request sent to manager")} className="flex-1">

@@ -6,8 +6,8 @@ import { AppProvider } from "@/context/AppContext";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "CareLog: Shift Handover System",
-  description: "Simple, clear shift handover for care home staff.",
+  title: "Carekel — Shift Handover App",
+  description: "Simple, clear shift handover records for care home staff.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -17,13 +17,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
           <AppProvider>
             {children}
-            <Toaster
-              position="bottom-right"
-              richColors
-              expand={false}
-              duration={4000}
-              toastOptions={{ style: { fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 500 } }}
-            />
+            <Toaster position="bottom-right" richColors expand={false} duration={4000}
+              toastOptions={{ style: { fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 500 } }} />
           </AppProvider>
         </ThemeProvider>
       </body>

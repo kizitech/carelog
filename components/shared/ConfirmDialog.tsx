@@ -4,17 +4,10 @@ import { Modal } from "./Modal";
 import { Button } from "./index";
 import { AlertTriangle } from "lucide-react";
 
-interface ConfirmDialogProps {
-  open: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  title: string;
-  description: string;
-  confirmLabel?: string;
-  danger?: boolean;
-}
-
-export function ConfirmDialog({ open, onClose, onConfirm, title, description, confirmLabel = "Confirm", danger = false }: ConfirmDialogProps) {
+export function ConfirmDialog({ open, onClose, onConfirm, title, description, confirmLabel = "Confirm", danger = false }: {
+  open: boolean; onClose: () => void; onConfirm: () => void;
+  title: string; description: string; confirmLabel?: string; danger?: boolean;
+}) {
   return (
     <Modal open={open} onClose={onClose} title={title}>
       <div className="space-y-5">
@@ -24,9 +17,7 @@ export function ConfirmDialog({ open, onClose, onConfirm, title, description, co
         </div>
         <div className="flex gap-3">
           <Button variant="outline" onClick={onClose} className="flex-1">Cancel</Button>
-          <Button variant={danger ? "danger" : "primary"} onClick={() => { onConfirm(); onClose(); }} className="flex-1">
-            {confirmLabel}
-          </Button>
+          <Button variant={danger ? "danger" : "primary"} onClick={() => { onConfirm(); onClose(); }} className="flex-1">{confirmLabel}</Button>
         </div>
       </div>
     </Modal>

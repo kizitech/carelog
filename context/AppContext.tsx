@@ -4,11 +4,13 @@ import {
   createContext, useContext, useState, useEffect,
   useCallback, useMemo, type ReactNode,
 } from "react";
-import type { User, Resident, ShiftLog } from "@/types";
-import { SEED_RESIDENTS, SEED_LOGS } from "@/lib/seed";
-import { saveToStorage, loadFromStorage, getInitials, getShift, todayStr } from "@/lib/utils";
+import type { User, Resident, ShiftRecord } from "@/types";
+import { SEED_RESIDENTS, SEED_RECORDS } from "@/lib/seed";
+import {
+  saveToStorage, loadFromStorage, getInitials, getShift, todayStr,
+} from "@/lib/utils";
 import { v4 as uuid } from "uuid";
-import type { ShiftLogFormValues } from "@/lib/schemas";
+import type { ShiftRecordFormValues } from "@/lib/schemas";
 
 interface AppContextValue {
   // Auth
@@ -21,30 +23,25 @@ interface AppContextValue {
   residents: Resident[];
   getResident: (id: string) => Resident | undefined;
 
-  // Shift Logs
-  logs: ShiftLog[];
-  activeLogs: ShiftLog[];
-  trashedLogs: ShiftLog[];
-  todayLogs: ShiftLog[];
-  addLog: (values: ShiftLogFormValues) => void;
-  trashLog: (id: string) => void;
-  restoreLog: (id: string) => void;
-  deleteLog: (id: string) => void;
+  // Records (formerly logs)
+  records: ShiftRecord[];
+  activeRecords: ShiftRecord[];
+  trashedRecords: ShiftRecord[];
+  todayRecords: ShiftRecord[];
+  filteredRecords: ShiftRecord[];
+  addRecord: (values: ShiftRecordFormValues) => void;
+  trashRecord: (id: string) => void;
+  restoreRecord: (id: string) => void;
+  deleteRecord: (id: string) => void;
   clearTrash: () => void;
-
-  // History per resident
-  getResidentLogs: (residentId: string) => ShiftLog[];
+  getResidentRecords: (residentId: string) => ShiftRecord[];
 
   // Filters
   search: string; setSearch: (v: string) => void;
-  filterStaff: string; setFilterStaff: (v: string) => void;
   filterDate: string; setFilterDate: (v: string) => void;
-  filteredLogs: ShiftLog[];
+  filterStaff: string; setFilterStaff: (v: string) => void;
   clearFilters: () => void;
   hasActiveFilters: boolean;
-
-  // All unique staff names (for filter dropdown)
-  allStaffNames: string[];
 
   // Reset
   resetApp: () => void;
@@ -52,125 +49,163 @@ interface AppContextValue {
 
 const AppContext = createContext<AppContextValue | null>(null);
 
+// Default logged-in user — Evelyn Rose
 const DEFAULT_USER: User = {
-  id: "u1", name: "Ada Obi", email: "ada.obi@carehome.org",
-  role: "Senior Carer", shift: "Morning", avatar: "AO", wing: "Sunrise Wing",
+  id: "u1",
+  name: "Evelyn Rose",
+  email: "evelyn.rose@carekel.org",
+  role: "Senior Care Worker",
+  shift: "Morning",
+  avatar: "ER",
 };
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser]           = useState<User | null>(null);
   const [residents, setResidents] = useState<Resident[]>([]);
-  const [logs, setLogs] = useState<ShiftLog[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+  const [records, setRecords]     = useState<ShiftRecord[]>([]);
+  const [hydrated, setHydrated]   = useState(false);
 
-  const [search, setSearch] = useState("");
+  // Filters
+  const [search,      setSearch]      = useState("");
+  const [filterDate,  setFilterDate]  = useState("");
   const [filterStaff, setFilterStaff] = useState("");
-  const [filterDate, setFilterDate] = useState("");
 
+  // Load from localStorage on mount
   useEffect(() => {
-    const savedUser      = loadFromStorage<User | null>("cl_user", null);
-    const savedLogs      = loadFromStorage<ShiftLog[]>("cl_logs", SEED_LOGS);
-    const savedResidents = loadFromStorage<Resident[]>("cl_residents", SEED_RESIDENTS);
+    const savedUser      = loadFromStorage<User | null>("ck_user", null);
+    const savedRecords   = loadFromStorage<ShiftRecord[]>("ck_records", SEED_RECORDS);
+    const savedResidents = loadFromStorage<Resident[]>("ck_residents", SEED_RESIDENTS);
     if (savedUser) setUser(savedUser);
-    setLogs(savedLogs);
+    setRecords(savedRecords);
     setResidents(savedResidents);
     setHydrated(true);
   }, []);
 
-  useEffect(() => { if (hydrated) saveToStorage("cl_logs", logs); }, [logs, hydrated]);
-  useEffect(() => { if (hydrated) saveToStorage("cl_user", user); }, [user, hydrated]);
-  useEffect(() => { if (hydrated) saveToStorage("cl_residents", residents); }, [residents, hydrated]);
+  useEffect(() => { if (hydrated) saveToStorage("ck_records",   records);   }, [records, hydrated]);
+  useEffect(() => { if (hydrated) saveToStorage("ck_user",      user);      }, [user, hydrated]);
+  useEffect(() => { if (hydrated) saveToStorage("ck_residents", residents); }, [residents, hydrated]);
 
   const login = useCallback((email: string) => {
-    const name = email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+    // Reuse Evelyn Rose for the demo; name derived from email if different
+    const name = email === DEFAULT_USER.email
+      ? DEFAULT_USER.name
+      : email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, c => c.toUpperCase());
     const newUser: User = {
-      ...DEFAULT_USER, id: uuid(), name, email,
-      avatar: getInitials(name), shift: getShift(),
+      ...DEFAULT_USER,
+      id: uuid(),
+      name,
+      email,
+      avatar: getInitials(name),
+      shift: getShift(),
     };
     setUser(newUser);
   }, []);
 
-  const logout = useCallback(() => { setUser(null); saveToStorage("cl_user", null); }, []);
+  const logout = useCallback(() => {
+    setUser(null);
+    saveToStorage("ck_user", null);
+  }, []);
 
   const updateProfile = useCallback((data: Partial<User>) => {
-    setUser(u => u ? { ...u, ...data, avatar: getInitials(data.name || u.name) } : u);
+    setUser(u => {
+      if (!u) return u;
+      return { ...u, ...data, avatar: getInitials(data.name ?? u.name) };
+    });
   }, []);
 
-  const getResident = useCallback((id: string) => residents.find(r => r.id === id), [residents]);
+  const getResident = useCallback(
+    (id: string) => residents.find(r => r.id === id),
+    [residents]
+  );
 
-  const addLog = useCallback((values: ShiftLogFormValues) => {
+  const getResidentRecords = useCallback(
+    (residentId: string) =>
+      records
+        .filter(r => !r.trashed && r.residentId === residentId)
+        .sort((a, b) => b.timestamp - a.timestamp),
+    [records]
+  );
+
+  const addRecord = useCallback((values: ShiftRecordFormValues) => {
     if (!user) return;
     const resident = residents.find(r => r.id === values.residentId);
-    const newLog: ShiftLog = {
+    const newRecord: ShiftRecord = {
       id: uuid(),
-      residentId: values.residentId,
-      residentName: resident?.name || values.residentId,
-      staffId: user.id,
-      staffName: values.staffName,
-      shift: values.shift,
-      date: values.date,
-      timestamp: Date.now(),
-      conditionUpdate: values.conditionUpdate,
-      medicationTaken: values.medicationTaken,
-      incidents: values.incidents || "",
+      residentId:        values.residentId,
+      residentName:      resident?.name ?? values.residentId,
+      staffName:         values.staffName,
+      shift:             values.shift,
+      date:              values.date,
+      timestamp:         Date.now(),
+      conditionUpdate:   values.conditionUpdate,
+      observations:      values.observations,
+      careProvided:      values.careProvided || "",
+      medicationTaken:   values.medicationTaken,
+      incidents:         values.incidents || "",
       tasksForNextShift: values.tasksForNextShift,
-      careProvided: values.careProvided || "",
       trashed: false,
     };
-    setLogs(l => [newLog, ...l]);
+    // Update the resident's currentCondition in-place
+    setResidents(rs =>
+      rs.map(r => r.id === values.residentId
+        ? { ...r, currentCondition: values.conditionUpdate }
+        : r
+      )
+    );
+    setRecords(prev => [newRecord, ...prev]);
   }, [user, residents]);
 
-  const trashLog   = useCallback((id: string) => setLogs(l => l.map(log => log.id === id ? { ...log, trashed: true  } : log)), []);
-  const restoreLog = useCallback((id: string) => setLogs(l => l.map(log => log.id === id ? { ...log, trashed: false } : log)), []);
-  const deleteLog  = useCallback((id: string) => setLogs(l => l.filter(log => log.id !== id)), []);
-  const clearTrash = useCallback(() => setLogs(l => l.filter(log => !log.trashed)), []);
+  const trashRecord   = useCallback((id: string) => setRecords(r => r.map(x => x.id === id ? { ...x, trashed: true  } : x)), []);
+  const restoreRecord = useCallback((id: string) => setRecords(r => r.map(x => x.id === id ? { ...x, trashed: false } : x)), []);
+  const deleteRecord  = useCallback((id: string) => setRecords(r => r.filter(x => x.id !== id)), []);
+  const clearTrash    = useCallback(() => setRecords(r => r.filter(x => !x.trashed)), []);
 
   const resetApp = useCallback(() => {
-    setLogs(SEED_LOGS);
+    setRecords(SEED_RECORDS);
     setResidents(SEED_RESIDENTS);
-    saveToStorage("cl_logs",      SEED_LOGS);
-    saveToStorage("cl_residents", SEED_RESIDENTS);
+    saveToStorage("ck_records", SEED_RECORDS);
+    saveToStorage("ck_residents", SEED_RESIDENTS);
   }, []);
 
-  const getResidentLogs = useCallback((residentId: string) =>
-    logs.filter(l => !l.trashed && l.residentId === residentId)
-      .sort((a, b) => b.timestamp - a.timestamp),
-    [logs]
-  );
+  const clearFilters = useCallback(() => {
+    setSearch(""); setFilterDate(""); setFilterStaff("");
+  }, []);
 
-  const activeLogs  = useMemo(() => logs.filter(l => !l.trashed), [logs]);
-  const trashedLogs = useMemo(() => logs.filter(l =>  l.trashed), [logs]);
-  const todayLogs   = useMemo(() => activeLogs.filter(l => l.date === todayStr()), [activeLogs]);
+  // Derived collections
+  const activeRecords  = useMemo(() => records.filter(r => !r.trashed), [records]);
+  const trashedRecords = useMemo(() => records.filter(r => r.trashed),  [records]);
+  const todayRecords   = useMemo(() => activeRecords.filter(r => r.date === todayStr()), [activeRecords]);
 
-  const allStaffNames = useMemo(() =>
-    Array.from(new Set(activeLogs.map(l => l.staffName))).sort(),
-    [activeLogs]
-  );
-
-  const filteredLogs = useMemo(() => {
-    return activeLogs.filter(l => {
-      const q = search.toLowerCase().trim();
-      if (q && !l.residentName.toLowerCase().includes(q) && !l.staffName.toLowerCase().includes(q)) return false;
-      if (filterStaff && l.staffName !== filterStaff) return false;
-      if (filterDate  && l.date !== filterDate)        return false;
+  const filteredRecords = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    // Normalize a value to YYYY-MM-DD so browser locale differences don't break the comparison
+    const normDate = (v: string) => v ? v.slice(0, 10) : "";
+    return activeRecords.filter(r => {
+      if (q && !r.residentName.toLowerCase().includes(q) && !r.staffName.toLowerCase().includes(q)) return false;
+      if (filterDate  && normDate(r.date) !== normDate(filterDate)) return false;
+      if (filterStaff && r.staffName !== filterStaff) return false;
       return true;
     });
-  }, [activeLogs, search, filterStaff, filterDate]);
+  }, [activeRecords, search, filterDate, filterStaff]);
 
-  const clearFilters = useCallback(() => { setSearch(""); setFilterStaff(""); setFilterDate(""); }, []);
-  const hasActiveFilters = !!(search || filterStaff || filterDate);
+  const hasActiveFilters = !!(search || filterDate || filterStaff);
+
+  const allStaffNames = useMemo(
+    () => Array.from(new Set(activeRecords.map(r => r.staffName))).sort(),
+    [activeRecords]
+  );
 
   return (
     <AppContext.Provider value={{
       user, login, logout, updateProfile,
       residents, getResident,
-      logs, activeLogs, trashedLogs, todayLogs,
-      addLog, trashLog, restoreLog, deleteLog, clearTrash,
-      getResidentLogs,
-      search, setSearch, filterStaff, setFilterStaff,
+      records, activeRecords, trashedRecords, todayRecords, filteredRecords,
+      addRecord, trashRecord, restoreRecord, deleteRecord, clearTrash,
+      getResidentRecords,
+      search, setSearch,
       filterDate, setFilterDate,
-      filteredLogs, clearFilters, hasActiveFilters,
-      allStaffNames,
+      filterStaff, setFilterStaff,
+      clearFilters, hasActiveFilters,
       resetApp,
     }}>
       {children}
@@ -180,6 +215,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
 export function useApp(): AppContextValue {
   const ctx = useContext(AppContext);
-  if (!ctx) throw new Error("useApp must be used within AppProvider");
+  if (!ctx) throw new Error("useApp must be used inside AppProvider");
   return ctx;
 }
