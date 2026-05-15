@@ -43,7 +43,7 @@ export function Navbar() {
             </div>
             <div>
               <p className="text-[15px] font-extrabold text-blue-700 dark:text-blue-400 tracking-tight leading-none">Carekel</p>
-              <p className="text-[9px] text-muted-foreground font-semibold tracking-widest uppercase leading-none mt-0.5">Shift Handover</p>
+              <p className="text-[9px] text-muted-foreground font-semibold tracking-widest uppercase leading-none mt-0.5">Digital Care Home</p>
             </div>
           </Link>
 
