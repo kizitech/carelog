@@ -49,31 +49,31 @@ interface AppContextValue {
 
 const AppContext = createContext<AppContextValue | null>(null);
 
-// Default logged-in user — Evelyn Rose
+// Default logged-in user — Alison Hart
 const DEFAULT_USER: User = {
   id: "u1",
-  name: "Evelyn Rose",
-  email: "evelyn.rose@carekel.org",
+  name: "Alison Hart",
+  email: "alison.hart@carekel.org",
   role: "Senior Care Worker",
   shift: "Morning",
   avatar: "ER",
 };
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [user, setUser]           = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [residents, setResidents] = useState<Resident[]>([]);
-  const [records, setRecords]     = useState<ShiftRecord[]>([]);
-  const [hydrated, setHydrated]   = useState(false);
+  const [records, setRecords] = useState<ShiftRecord[]>([]);
+  const [hydrated, setHydrated] = useState(false);
 
   // Filters
-  const [search,      setSearch]      = useState("");
-  const [filterDate,  setFilterDate]  = useState("");
+  const [search, setSearch] = useState("");
+  const [filterDate, setFilterDate] = useState("");
   const [filterStaff, setFilterStaff] = useState("");
 
   // Load from localStorage on mount
   useEffect(() => {
-    const savedUser      = loadFromStorage<User | null>("ck_user", null);
-    const savedRecords   = loadFromStorage<ShiftRecord[]>("ck_records", SEED_RECORDS);
+    const savedUser = loadFromStorage<User | null>("ck_user", null);
+    const savedRecords = loadFromStorage<ShiftRecord[]>("ck_records", SEED_RECORDS);
     const savedResidents = loadFromStorage<Resident[]>("ck_residents", SEED_RESIDENTS);
     if (savedUser) setUser(savedUser);
     setRecords(savedRecords);
@@ -81,12 +81,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setHydrated(true);
   }, []);
 
-  useEffect(() => { if (hydrated) saveToStorage("ck_records",   records);   }, [records, hydrated]);
-  useEffect(() => { if (hydrated) saveToStorage("ck_user",      user);      }, [user, hydrated]);
+  useEffect(() => { if (hydrated) saveToStorage("ck_records", records); }, [records, hydrated]);
+  useEffect(() => { if (hydrated) saveToStorage("ck_user", user); }, [user, hydrated]);
   useEffect(() => { if (hydrated) saveToStorage("ck_residents", residents); }, [residents, hydrated]);
 
   const login = useCallback((email: string) => {
-    // Reuse Evelyn Rose for the demo; name derived from email if different
+    // Reuse Alison Hart for the demo; name derived from email if different
     const name = email === DEFAULT_USER.email
       ? DEFAULT_USER.name
       : email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, c => c.toUpperCase());
@@ -131,17 +131,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const resident = residents.find(r => r.id === values.residentId);
     const newRecord: ShiftRecord = {
       id: uuid(),
-      residentId:        values.residentId,
-      residentName:      resident?.name ?? values.residentId,
-      staffName:         values.staffName,
-      shift:             values.shift,
-      date:              values.date,
-      timestamp:         Date.now(),
-      conditionUpdate:   values.conditionUpdate,
-      observations:      values.observations,
-      careProvided:      values.careProvided || "",
-      medicationTaken:   values.medicationTaken,
-      incidents:         values.incidents || "",
+      residentId: values.residentId,
+      residentName: resident?.name ?? values.residentId,
+      staffName: values.staffName,
+      shift: values.shift,
+      date: values.date,
+      timestamp: Date.now(),
+      conditionUpdate: values.conditionUpdate,
+      observations: values.observations,
+      careProvided: values.careProvided || "",
+      medicationTaken: values.medicationTaken,
+      incidents: values.incidents || "",
       tasksForNextShift: values.tasksForNextShift,
       trashed: false,
     };
@@ -155,10 +155,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setRecords(prev => [newRecord, ...prev]);
   }, [user, residents]);
 
-  const trashRecord   = useCallback((id: string) => setRecords(r => r.map(x => x.id === id ? { ...x, trashed: true  } : x)), []);
+  const trashRecord = useCallback((id: string) => setRecords(r => r.map(x => x.id === id ? { ...x, trashed: true } : x)), []);
   const restoreRecord = useCallback((id: string) => setRecords(r => r.map(x => x.id === id ? { ...x, trashed: false } : x)), []);
-  const deleteRecord  = useCallback((id: string) => setRecords(r => r.filter(x => x.id !== id)), []);
-  const clearTrash    = useCallback(() => setRecords(r => r.filter(x => !x.trashed)), []);
+  const deleteRecord = useCallback((id: string) => setRecords(r => r.filter(x => x.id !== id)), []);
+  const clearTrash = useCallback(() => setRecords(r => r.filter(x => !x.trashed)), []);
 
   const resetApp = useCallback(() => {
     setRecords(SEED_RECORDS);
@@ -172,9 +172,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Derived collections
-  const activeRecords  = useMemo(() => records.filter(r => !r.trashed), [records]);
-  const trashedRecords = useMemo(() => records.filter(r => r.trashed),  [records]);
-  const todayRecords   = useMemo(() => activeRecords.filter(r => r.date === todayStr()), [activeRecords]);
+  const activeRecords = useMemo(() => records.filter(r => !r.trashed), [records]);
+  const trashedRecords = useMemo(() => records.filter(r => r.trashed), [records]);
+  const todayRecords = useMemo(() => activeRecords.filter(r => r.date === todayStr()), [activeRecords]);
 
   const filteredRecords = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -182,7 +182,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const normDate = (v: string) => v ? v.slice(0, 10) : "";
     return activeRecords.filter(r => {
       if (q && !r.residentName.toLowerCase().includes(q) && !r.staffName.toLowerCase().includes(q)) return false;
-      if (filterDate  && normDate(r.date) !== normDate(filterDate)) return false;
+      if (filterDate && normDate(r.date) !== normDate(filterDate)) return false;
       if (filterStaff && r.staffName !== filterStaff) return false;
       return true;
     });

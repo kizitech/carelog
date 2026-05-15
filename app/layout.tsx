@@ -6,8 +6,8 @@ import { AppProvider } from "@/context/AppContext";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "Carekel — Shift Handover App",
-  description: "Simple, clear shift handover records for care home staff.",
+  title: "Carekel — Digital Care Home App",
+  description: "Simple, clear digital care home records for care home staff.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

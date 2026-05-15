@@ -18,7 +18,7 @@ export default function LoginPage() {
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "evelyn.rose@carekel.org", password: "password" },
+    defaultValues: { email: "alison.hart@carekel.org", password: "password" },
   });
 
   const onSubmit = async (data: LoginFormValues) => {
@@ -41,7 +41,7 @@ export default function LoginPage() {
             <Heart className="w-7 h-7 text-white" strokeWidth={2.5} />
           </div>
           <h1 className="text-[28px] font-extrabold text-foreground tracking-tight">Carekel</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Shift Handover App</p>
+          <p className="text-muted-foreground mt-1 text-sm">Digital Care Home App</p>
         </div>
 
         {/* Card */}
